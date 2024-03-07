@@ -16,6 +16,8 @@ registries = [
     "mirror.gcr.io",
     "dockerproxy.com",
     "docker.nju.edu.cn",
+    "docker.mirrors.sjtug.sjtu.edu.cn",
+    "docker.m.daocloud.io"
 ]
 
 image = "library/nginx:1.25.1-alpine"
