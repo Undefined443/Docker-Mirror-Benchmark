@@ -95,6 +95,7 @@ with ThreadPoolExecutor() as executor:
                 print(
                     f"\033[32m{registry} is good (took {elapsed_time:.2f} seconds)\033[0m"
                 )
+                cleanup_image(registry, timeout_seconds) # 测试成功后删除镜像
             else:
                 if elapsed_time >= timeout_seconds: # 因为超时导致失败
                     print(
@@ -106,6 +107,4 @@ with ThreadPoolExecutor() as executor:
                     )
         except Exception as exc:
             print(f"{registry} generated an exception: {exc}")
-        finally:
-            # 清理镜像
-            cleanup_image(registry, timeout_seconds)
+            
