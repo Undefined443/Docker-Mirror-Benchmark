@@ -6,6 +6,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# 要测试的镜像源
 registries = [
     "docker.io",
     "registry-1.docker.io",
@@ -20,11 +21,12 @@ registries = [
     "docker.m.daocloud.io"
 ]
 
+# 要测试的镜像
 image = "library/nginx:1.25.1-alpine"
 timeout_seconds = 60  # 设置超时时间为 60 秒
 
 
-# 这个函数将会被调用当信号被捕获时
+# 当信号被捕获时这个函数将会被调用
 def signal_handler(sig, frame):
     for registry in registries:
         cleanup_image(registry, timeout_seconds)
@@ -35,6 +37,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
+# 下载一个镜像
 def run_command(registry, timeout):
     command = ["docker", "pull", f"{registry}/{image}"]
     try:
@@ -58,6 +61,7 @@ def run_command(registry, timeout):
         return registry, False, elapsed_time
 
 
+# 删除一个镜像
 def cleanup_image(registry, timeout):
     command = ["docker", "rmi", f"{registry}/{image}"]
     try:
@@ -72,7 +76,7 @@ def cleanup_image(registry, timeout):
     except subprocess.TimeoutExpired:
         print(f"Warning: 'docker rmi' command timed out for {registry}")
     except subprocess.CalledProcessError:
-        # print(f"Warning: 'docker rmi' command failed for {registry}")
+        print(f"Warning: 'docker rmi' command failed for {registry}")
         pass
 
 
@@ -92,16 +96,16 @@ with ThreadPoolExecutor() as executor:
                     f"\033[32m{registry} is good (took {elapsed_time:.2f} seconds)\033[0m"
                 )
             else:
-                if elapsed_time >= timeout_seconds:
+                if elapsed_time >= timeout_seconds: # 因为超时导致失败
                     print(
                         f"\033[33m{registry} test timed out after {elapsed_time:.2f} seconds\033[0m"
                     )
-                else:
+                else: # 其他原因导致失败
                     print(
                         f"\033[31m{registry} is outdated (took {elapsed_time:.2f} seconds)\033[0m"
                     )
         except Exception as exc:
             print(f"{registry} generated an exception: {exc}")
         finally:
-            # 清理镜像，也可以并行操作，但为了简单起见这里逐个执行
+            # 清理镜像
             cleanup_image(registry, timeout_seconds)
