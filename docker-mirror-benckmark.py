@@ -100,9 +100,9 @@ with ThreadPoolExecutor() as executor:
                     print(
                         f"\033[33m{registry} test timed out after {elapsed_time:.2f} seconds\033[0m"
                     )
-                else: # 其他原因导致失败
+                else: # 其他原因导致失败（镜像失效）
                     print(
-                        f"\033[31m{registry} is outdated (took {elapsed_time:.2f} seconds)\033[0m"
+                        f"\033[31m{registry} unable to connect (took {elapsed_time:.2f} seconds)\033[0m"
                     )
         except Exception as exc:
             print(f"{registry} generated an exception: {exc}")
